@@ -5,7 +5,7 @@ import numpy
 import matplotlib.pyplot as plt
 import math
 
-timeDelay = 0.6
+timeDelay = 0.7
 startFreq = float(input('Start Frequency (in Hz): '))
 endFreq = float(input('End Frequency (in Hz): '))
 if startFreq < 0 or endFreq < 0:
@@ -63,14 +63,16 @@ freqValues = numpy.zeros(freqSteps+1)
 c1.amplitude(waveVMax*2)
 freq = startFreq
 c1.frequency(freq)
+scope.write("TIMebase:MAIN:SCAle " + str(1/(3*freq)))
 time.sleep(2*timeDelay)
 i = 0
 while i <= freqSteps:
 	CH1VMax[i] = scope.query("MEASure:ITEM? VMAX,CHANnel1")
 	CH2VMax[i] = scope.query("MEASure:ITEM? VMAX,CHANnel2")
-	freqValues[i] =freq;
+	freqValues[i] = freq;
 	freq = freq + freqInc
 	c1.frequency(freq)
+	scope.write("TIMebase:MAIN:SCAle "+ str(1/(3*freq)))
 	time.sleep(timeDelay)
 	i = i + 1
 
