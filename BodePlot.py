@@ -5,12 +5,13 @@ import numpy
 import matplotlib.pyplot as plt
 import math
 
+fichero = open('config.txt')
 ########################
 timeDelay = 0.7 #Adjust the time delay between frequency increments (in seconds)
 ########################
 
-startFreq = float(input('Start Frequency (in Hz): '))	#Read the start frequency
-endFreq = float(input('End Frequency (in Hz): '))		#Read the end frequency
+startFreq = float(fichero.readline().split(',')[1])		#Read the start frequency
+endFreq = float(fichero.readline().split(',')[1])		#Read the end frequency
 if startFreq < 0 or endFreq < 0:
 	print('ERROR. Frequency must be possitive')
 	print('Please press Enter to exit :-(')
@@ -22,18 +23,23 @@ if startFreq > endFreq:
 	input()
 	exit()
 
-freqSteps = int(input('Frequency Steps: '))			#Read the frequency steps
+freqSteps = int(fichero.readline().split(',')[1])			#Read the frequency steps
 if freqSteps <= 0:
-	print('ERROR. Max Voltage must be greater than zero')
+	print('ERROR. Frequency steps must be greater than zero')
 	print('Please press Enter to exit :-(')
 	input()
 	exit()
-waveVMax = float(input('Sine Wave Max Voltage: '))		#Read the max voltage of sine wave
+waveVMax = float(fichero.readline().split(',')[1])		#Read the max voltage of sine wave
 if waveVMax <= 0:
 	print('ERROR. Max Voltage must be greater than zero')
 	print('Please press Enter to exit :-(')
 	input()
 	exit()
+
+print(startFreq)
+print(endFreq)
+print(freqSteps)
+print(waveVMax)
 
 freqInc = ((endFreq-startFreq)/freqSteps)			#Compute the frequency increments in function of steps, start and end frequencies
 
@@ -46,7 +52,9 @@ scope.write("MEASure:CLEar ALL")				#Clear all measurement items
 scope.write("MEASure:ITEM VMAX,CHANnel1")			#Create the VMax measurement item for CH1
 scope.write("MEASure:ITEM VMAX,CHANnel2")			#Create the VMax measurement item for CH2
 
-ft = feeltech.FeelTech('/dev/ttyUSB0')			#Connect the FY3224s generator
+port_gen = fichero.readline().split(',')[1]
+
+ft = feeltech.FeelTech(port_gen)			#Connect the FY3224s generator
 c1 = feeltech.Channel(1,ft)					#Init the CH1 of generator
 
 CH1VMax = numpy.zeros(freqSteps+1)				#Create an array for CH1 measurements
