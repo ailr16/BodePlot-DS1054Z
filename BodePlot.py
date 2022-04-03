@@ -36,23 +36,26 @@ if waveVMax <= 0:
 	input()
 	exit()
 
-print(startFreq)
-print(endFreq)
-print(freqSteps)
-print(waveVMax)
-
 freqInc = ((endFreq-startFreq)/freqSteps)			#Compute the frequency increments in function of steps, start and end frequencies
 
-rm = pyvisa.ResourceManager()					#PyVISA Resource Manager
-print("List of connected instruments:")
-print(rm.list_resources())					#Show the list of detected instruments
-instrument = input('Please enter the oscilloscope ID: ')	#Read the ID of oscilloscope
+rm = pyvisa.ResourceManager()						#PyVISA Resource Manager
+instrument = fichero.readline().split(',')[1]
+instrument = instrument[:-1]
 scope = rm.open_resource(instrument)				#Identify oscilloscope with "scope"
-scope.write("MEASure:CLEar ALL")				#Clear all measurement items
+scope.write("MEASure:CLEar ALL")					#Clear all measurement items
 scope.write("MEASure:ITEM VMAX,CHANnel1")			#Create the VMax measurement item for CH1
 scope.write("MEASure:ITEM VMAX,CHANnel2")			#Create the VMax measurement item for CH2
 
 port_gen = fichero.readline().split(',')[1]
+port_gen = port_gen[:-1]
+
+
+print("Start Frequency: " + str(startFreq))
+print("End Frequency" + str(endFreq))
+print("Frequency Step: " + str(freqSteps))
+print("Max voltage: " + str(waveVMax))
+print("Instrument ID: " + instrument)
+print("Generator serial port: " + port_gen)
 
 ft = feeltech.FeelTech(port_gen)			#Connect the FY3224s generator
 c1 = feeltech.Channel(1,ft)					#Init the CH1 of generator
@@ -94,15 +97,43 @@ while i <= freqSteps:
 	freq = freq + freqInc						#Increment frequency
 	i = i + 1							#Increment index
 
-db = (CH2VMax/CH1VMax)				#Cocient between CH2VMax and CH1VMax (for compute db)
-db = 20*numpy.log10(db)			#Compute db
+scale = fichero.readline().split(',')[1]
 
-plt.plot(freqValues,db)			#Graph data
-plt.xlabel('f')
-plt.ylabel('dB')
-plt.title('Bode Plot')
-plt.grid()
-plt.show()
+if scale == 'db':
+	db = (CH2VMax/CH1VMax)				#Cocient between CH2VMax and CH1VMax (for compute db)
+	db = 20*numpy.log10(db)				#Compute db
+	plt.plot(freqValues,db)			#Graph data
+	plt.xlabel('f')
+	plt.ylabel('dB')
+	plt.title('Bode Plot')
+	plt.grid()
+	plt.show()
+
+elif scale == 'v':
+	plt.plot(freqValues,CH2VMax)			#Graph data
+	plt.xlabel('f')
+	plt.ylabel('Vout')
+	plt.title('Bode Plot')
+	plt.grid()
+	plt.show()
+
+elif scale == 'both':
+	db = (CH2VMax/CH1VMax)				#Cocient between CH2VMax and CH1VMax (for compute db)
+	db = 20*numpy.log10(db)				#Compute db
+	figdb = plt.figure(1)
+	plt.plot(freqValues,db)				#Graph data
+	plt.xlabel('f')
+	plt.ylabel('dB')
+	plt.title('Bode Plot (dB)')
+	plt.grid()
+
+	figv = plt.figure(2)
+	plt.plot(freqValues,CH2VMax)			#Graph data
+	plt.xlabel('f')
+	plt.ylabel('Vout')
+	plt.title('Bode Plot (V)')
+	plt.grid()
+	plt.show()
 
 scope.close()					#Stop communication with oscilloscope
-
+ft.close()
