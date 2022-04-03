@@ -49,13 +49,18 @@ scope.write("MEASure:ITEM VMAX,CHANnel2")			#Create the VMax measurement item fo
 port_gen = fichero.readline().split(',')[1]
 port_gen = port_gen[:-1]
 
+scale = fichero.readline().split(',')[1]
 
+print("-"*32)
+print("Starting...")
 print("Start Frequency: " + str(startFreq))
-print("End Frequency" + str(endFreq))
+print("End Frequency: " + str(endFreq))
 print("Frequency Step: " + str(freqSteps))
 print("Max voltage: " + str(waveVMax))
 print("Instrument ID: " + instrument)
 print("Generator serial port: " + port_gen)
+print("Scale " + scale)
+
 
 ft = feeltech.FeelTech(port_gen)			#Connect the FY3224s generator
 c1 = feeltech.Channel(1,ft)					#Init the CH1 of generator
@@ -63,7 +68,8 @@ c1 = feeltech.Channel(1,ft)					#Init the CH1 of generator
 CH1VMax = numpy.zeros(freqSteps+1)				#Create an array for CH1 measurements
 CH2VMax = numpy.zeros(freqSteps+1)				#Create an array for CH2 measurements
 db = numpy.zeros(freqSteps+1)					#Create an array for the result in db
-freqValues = numpy.zeros(freqSteps+1)				#Create an arrayo for values of frequency
+freqValues = numpy.zeros(freqSteps+1)				#Create an array for values of frequency
+db3 = numpy.zeros(freqSteps+1)				#Create an array for plot a line in -3db
 
 c1.waveform(feeltech.SINE)					#CH1 will generate a sine wave
 c1.amplitude(waveVMax*2)					#Set CH1 peak to peak voltage
@@ -93,16 +99,19 @@ while i <= freqSteps:
 	time.sleep(timeDelay)						#Time delay
 	CH1VMax[i] = scope.query("MEASure:ITEM? VMAX,CHANnel1")	#Read and save CH1 VMax
 	CH2VMax[i] = scope.query("MEASure:ITEM? VMAX,CHANnel2")	#Read and save CH2 Vmax
-	freqValues[i] = freq;						#Save actual frequency
+	freqValues[i] = freq						#Save actual frequency
+	db3[i] = -3.01
 	freq = freq + freqInc						#Increment frequency
 	i = i + 1							#Increment index
 
-scale = fichero.readline().split(',')[1]
+print("Ended")
+print("-"*32)
 
 if scale == 'db':
 	db = (CH2VMax/CH1VMax)				#Cocient between CH2VMax and CH1VMax (for compute db)
 	db = 20*numpy.log10(db)				#Compute db
-	plt.plot(freqValues,db)			#Graph data
+	plt.plot(freqValues,db)				#Graph data
+	plt.plot(freqValues, db3)
 	plt.xlabel('f')
 	plt.ylabel('dB')
 	plt.title('Bode Plot')

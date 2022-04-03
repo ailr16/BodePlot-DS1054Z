@@ -1,7 +1,7 @@
 start_frequency,100
 end_frequency,10000
-frequency_steps,10
+frequency_steps,20
 max_voltage,5
 oscilloscope_ID,USB0::0x1AB1::0x04CE::DS1ZA202711731::INSTR
 generator_port,COM5
-scale,both
+scale,db
