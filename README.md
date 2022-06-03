@@ -11,3 +11,5 @@ Example:
   oscilloscope_ID,USB0::0x1AB1::0x04CE::DS1ZA202711731::INSTR
   generator_port,COM5
   scale,both
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/WFBuwD8cPuU/0.jpg)](http://www.youtube.com/watch?v=WFBuwD8cPuU "Bode Plotter (DS1054Z-FY3224S)")
