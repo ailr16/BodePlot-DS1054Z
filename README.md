@@ -13,3 +13,5 @@ Example:
   scale,both
 
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/WFBuwD8cPuU/0.jpg)](http://www.youtube.com/watch?v=WFBuwD8cPuU "Bode Plotter (DS1054Z-FY3224S)")
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/ivJM8q00k0E/0.jpg)](http://www.youtube.com/watch?v=ivJM8q00k0E "Bode Plot - Rigol DS1054Z and FY3224S")
