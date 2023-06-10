@@ -1,5 +1,14 @@
 # BodePlot-DS1054Z
 ## Python based Bode plotter with Rigol DS1054Z and FY3224S
+###Installing/Updating Required Modules
+####PyVisa
+pip install PyVISA
+####Feeltech control
+pip install feeltech
+####Matplotlib
+pip install matplotlib
+####NumPy
+pip insall numpy
 
 ### You can change the parameters in the config.txt file:
 
