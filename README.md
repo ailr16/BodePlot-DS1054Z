@@ -3,6 +3,7 @@
 ### Installing/Updating Required Modules
 #### PyVisa
 pip install PyVISA
+pip install PyVISA-py
 #### Feeltech control
 pip install feeltech
 #### Matplotlib
