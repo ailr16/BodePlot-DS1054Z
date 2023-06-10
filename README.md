@@ -2,7 +2,7 @@
 ## Python based Bode plotter with Rigol DS1054Z and FY3224S
 ### Installing/Updating Required Modules
 #### PyVisa
-pip install PyVISA
+pip install PyVISA  
 pip install PyVISA-py
 #### Feeltech control
 pip install feeltech
