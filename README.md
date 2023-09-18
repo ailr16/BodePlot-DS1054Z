@@ -1,5 +1,7 @@
 # BodePlot-DS1054Z
 ## Python based Bode plotter with Rigol DS1054Z and FY3224S
+### Check the releases
+- BodePlot-v1.0 -> https://github.com/ailr16/BodePlot-DS1054Z/releases/tag/releaseV1
 ### Installing/Updating Required Modules
 #### PyUSB
 `pip install pyusb`
