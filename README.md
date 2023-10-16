@@ -37,7 +37,7 @@
    
 
 ### Troubleshooting
-#### Linux Users /dev/ttyUSB0 permission denied
+#### Linux Users. */dev/ttyUSB0 permission denied*
 1. Run viewInstrumentsPorts.py
 ```
    ~/BodePlot-DS1054Z    main    python viewInstrumentPorts.py 
@@ -65,3 +65,16 @@ crw-rw---- 1 root uucp 188, 0 Jun 10 19:54 /dev/ttyUSB0
  sudo usermod -a -G uucp <USER>
  reboot
  ```
+
+#### Linux Users. *The oscilloscope don't shows in instrument list*
+
+There's a guide to setup the instruments with VISA. Check this:https://lucask07.github.io/instrbuilder/build/html/linux_visa.html
+
+- Basically create the file *99-com.rules* inside */etc/udev/rules.d/* (if it don't exist)
+- Add the line *SUBSYSTEM=="usb", MODE="0666", GROUP="usbusers"*
+- Add your user to *usbuser* group with:
+    ```
+    sudo groupadd usbusers
+    sudo usermod -a -G usbusers <USERNAME>
+    ```
+- Reboot
