@@ -78,3 +78,10 @@ There's a guide to setup the instruments with VISA. Check this:https://lucask07.
     sudo usermod -a -G usbusers <USERNAME>
     ```
 - Reboot
+
+#### Arch Linux Users. *Error import Tkinter*
+Install Tkinter with:
+
+```
+sudo pacman -S tk
+```
