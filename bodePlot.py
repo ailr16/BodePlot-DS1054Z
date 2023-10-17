@@ -1,7 +1,9 @@
-from GUI.main_window import MainWindow
+from GUI.main_window import BodePlotterApp
 from GUI.main_window import InstrumentFrame
+from GUI.main_window import TestFrame
 
 
-app = MainWindow()
-frame = InstrumentFrame(app)
+app = BodePlotterApp()
+inst = InstrumentFrame(app)
+test = TestFrame(app)
 app.mainloop()
