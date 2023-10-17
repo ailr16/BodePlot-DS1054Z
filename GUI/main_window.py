@@ -32,7 +32,7 @@ class InstrumentFrame(tk.Frame):
         self.config(border=1)
         self.config(bg=Colors.FRAME_BG)
         
-        self.grid(row=0, column=0, sticky="nsew", pady=4, padx=10)
+        self.grid(row=0, column=0, sticky="nsew", pady=5, padx=10)
 
         # label instrument
         self.label_name_frame = tk.Label(self, text='INSTRUMENT')
@@ -62,7 +62,7 @@ class TestFrame(tk.Frame):
         self.config(border=1)
         self.config(bg=Colors.FRAME_BG)
         
-        self.grid(row=1, column=0, sticky="nsew", pady=4, padx=10)
+        self.grid(row=1, column=0, sticky="nsew", pady=5, padx=10)
 
         # label instrument
         self.label_name_frame = tk.Label(self, text='TEST')
@@ -109,6 +109,37 @@ class TestFrame(tk.Frame):
         self.textbox_maxVoltage.config(width=24, height=1)
         self.textbox_maxVoltage.grid(row=4, column=1, sticky="w")
 
+class ActionsFrame(tk.Frame):
+    def __init__(self, container):
+        super().__init__(container)
+
+        self.config(relief="groove")
+        self.config(padx=8, pady=8)
+        self.config(border=1)
+        self.config(bg=Colors.FRAME_BG)
+        
+        self.grid(row=2, column=0, sticky="nsew", pady=5, padx=10)
+
+        # button run analysis
+        self.button_runAnalysis = tk.Button(self, text="Run Analysis", command=self.__runAnalysisCallback)
+        self.button_runAnalysis.config(width=45)
+        self.button_runAnalysis.config(bg=Colors.FRAME_BG)
+        self.button_runAnalysis.grid(row=0, column=0)
+
+        # button save log
+        self.button_saveLog = tk.Button(self, text="Save log", command=self.__runAnalysisCallback)
+        self.button_saveLog.config(width=45)
+        self.button_saveLog.config(bg=Colors.FRAME_BG)
+        self.button_saveLog.grid(row=1, column=0)
+
+        # button save plots
+        self.button_savePlots = tk.Button(self, text="Save plots", command=self.__runAnalysisCallback)
+        self.button_savePlots.config(width=45)
+        self.button_savePlots.config(bg=Colors.FRAME_BG)
+        self.button_savePlots.grid(row=2, column=0)
+
+    def __runAnalysisCallback(self):
+        print("heheheha")
 
 
 class BodePlotterApp(tk.Tk):
