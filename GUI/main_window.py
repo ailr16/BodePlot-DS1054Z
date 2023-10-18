@@ -1,12 +1,19 @@
-import  tkinter as tk
+import tkinter as tk
 from tkinter.messagebox import showinfo
+
+from datetime import datetime
+
+import numpy
+
 from Instruments.Instrument import Instruments
 from Instruments.Instrument import GeneratorConfig
 from Instruments.Instrument import ScopeConfig
+
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
 
 class Colors():
     def _rgb_to_tkHex(rgb):
@@ -285,18 +292,18 @@ class ActionsFrame(tk.Frame):
         self.button_saveLog.grid(row=2, column=0)
         self.button_saveLog["state"] = "disabled"
 
-        # label log to file
-        self.label_logFile = tk.Label(self, text='Log to file')
-        self.label_logFile.config(bg=Colors.FRAME_BG)
-        self.label_logFile.grid(row=3, column=0, sticky="w")
+        # label log dir
+        self.label_logDir = tk.Label(self, text='Save in')
+        self.label_logDir.config(bg=Colors.FRAME_BG)
+        self.label_logDir.grid(row=3, column=0, sticky="w")
 
-        # textbox log to file
-        self.__string_log_file = tk.StringVar()
-        self.textbox_logFile = tk.Entry(self, textvariable=self.__string_log_file)
-        self.textbox_logFile.config(width=48)
-        self.textbox_logFile.insert(-1, "/home/")
-        self.textbox_logFile.grid(row=4, column=0, sticky="w")
-        self.textbox_logFile["state"] = "disabled"
+        # textbox log dir
+        self.__string_log_dir = tk.StringVar()
+        self.textbox_logDir = tk.Entry(self, textvariable=self.__string_log_dir)
+        self.textbox_logDir.config(width=48)
+        self.textbox_logDir.insert(-1, "/home/$USER/Documents/")
+        self.textbox_logDir.grid(row=4, column=0, sticky="w")
+        self.textbox_logDir["state"] = "disabled"
 
         self.__figure = Figure(figsize=(9,6), dpi=100)
         self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -359,7 +366,7 @@ class ActionsFrame(tk.Frame):
         self.__instrument_frame.instruments.start_analysis(gen_config)
         self.button_saveLog["state"] = "normal"
         self.button_savePlots["state"] = "normal"
-        self.textbox_logFile["state"] = "normal"
+        self.textbox_logDir["state"] = "normal"
         
         
         self.__ax.clear()
@@ -369,16 +376,16 @@ class ActionsFrame(tk.Frame):
         self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array)
         self.__canvas.draw()
 
-        #self.__figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.__filename_date = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
 
 
     def __saveLog(self):
-        print(self.__list_visa[2])
-        print(self.__list_serial[1])
+        filename = self.__string_log_dir.get() + self.__filename_date
+        numpy.savetxt(filename + ".csv", numpy.c_[self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array], delimiter=",")
 
     def __savePlots(self):
-        print(self.__list_visa[2])
-        print(self.__list_serial[1])
+        filename = self.__string_log_dir.get() + self.__filename_date
+        self.__figure.savefig(filename + ".png")
 
 
 class MainWindow(tk.Tk):
