@@ -373,7 +373,9 @@ class ActionsFrame(tk.Frame):
         self.__ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
         self.__ax.grid(which="minor", color="#EEEEEE", linestyle="dotted")
         self.__ax.minorticks_on()
-        self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array)
+        self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array, label="Magnitude (db)")
+        self.__ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.08))
+        self.__ax.set_xlabel("Frequency")
         self.__canvas.draw()
 
         self.__filename_date = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
