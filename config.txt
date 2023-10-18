@@ -1,7 +1,0 @@
-start_frequency,100
-end_frequency,600000
-frequency_steps,20
-max_voltage,5
-oscilloscope_ID,USB0::0x1AB1::0x04CE::DS1ZA202711731::INSTR
-generator_port,/dev/ttyUSB0
-scale,db
