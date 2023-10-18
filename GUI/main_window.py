@@ -246,7 +246,7 @@ class ActionsFrame(tk.Frame):
 
         self.__scope_open_flag = 0
         self.__gen_open_flag = 0
-        self.__figure_created_flag = 0
+        self.__measurement_done_flag = 0
 
         self.__list_visa = instrument_frame.get_visa_list()
         self.__list_serial = instrument_frame.get_serial_list()
@@ -271,17 +271,32 @@ class ActionsFrame(tk.Frame):
         self.button_runAnalysis.config(bg=Colors.FRAME_BG)
         self.button_runAnalysis.grid(row=0, column=0)
 
-        # button save log
-        self.button_saveLog = tk.Button(self, text="Save log", command=self.__saveLog)
-        self.button_saveLog.config(width=45)
-        self.button_saveLog.config(bg=Colors.FRAME_BG)
-        self.button_saveLog.grid(row=1, column=0)
-
         # button save plots
         self.button_savePlots = tk.Button(self, text="Save plots", command=self.__savePlots)
         self.button_savePlots.config(width=45)
         self.button_savePlots.config(bg=Colors.FRAME_BG)
-        self.button_savePlots.grid(row=2, column=0)
+        self.button_savePlots.grid(row=1, column=0)
+        self.button_savePlots["state"] = "disabled"
+
+        # button save log
+        self.button_saveLog = tk.Button(self, text="Save log", command=self.__saveLog)
+        self.button_saveLog.config(width=45)
+        self.button_saveLog.config(bg=Colors.FRAME_BG)
+        self.button_saveLog.grid(row=2, column=0)
+        self.button_saveLog["state"] = "disabled"
+
+        # label log to file
+        self.label_logFile = tk.Label(self, text='Log to file')
+        self.label_logFile.config(bg=Colors.FRAME_BG)
+        self.label_logFile.grid(row=3, column=0, sticky="w")
+
+        # textbox log to file
+        self.__string_log_file = tk.StringVar()
+        self.textbox_logFile = tk.Entry(self, textvariable=self.__string_log_file)
+        self.textbox_logFile.config(width=48)
+        self.textbox_logFile.insert(-1, "/home/")
+        self.textbox_logFile.grid(row=4, column=0, sticky="w")
+        self.textbox_logFile["state"] = "disabled"
 
         self.__figure = Figure(figsize=(9,6), dpi=100)
         self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
@@ -342,6 +357,9 @@ class ActionsFrame(tk.Frame):
         self.__instrument_frame.instruments.initial_generator_config(gen_config)
 
         self.__instrument_frame.instruments.start_analysis(gen_config)
+        self.button_saveLog["state"] = "normal"
+        self.button_savePlots["state"] = "normal"
+        self.textbox_logFile["state"] = "normal"
         
         
         self.__ax.clear()
