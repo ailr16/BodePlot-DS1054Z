@@ -306,10 +306,13 @@ class ActionsFrame(tk.Frame):
             self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
             self.__canvas = FigureCanvasTkAgg(self.__figure, master=self.__plot_frame)
             self.__canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+            NavigationToolbar2Tk(self.__canvas, self.__plot_frame)
 
             self.__figure_created_flag = 1
         
         self.__ax.clear()
+        self.__ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
+        self.__ax.grid(which="minor", color="#EEEEEE", linestyle=":")
         self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array)
         self.__canvas.draw()
 
