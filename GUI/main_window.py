@@ -8,18 +8,19 @@ class Colors():
     
     MAIN_WINDOW_BG  = _rgb_to_tkHex((240, 240, 240))
     FRAME_BG        = _rgb_to_tkHex((227, 227, 227))
+    TEXTBOX_ERROR   = _rgb_to_tkHex((219, 118, 118))
+    TEXTBOX_OK      = _rgb_to_tkHex((255, 255, 255))
 
 
 class InstrumentFrame(tk.Frame):
-    options_list_visa = [""]
-    options_list_serial = [""]
-
     def __init__(self, container):
         super().__init__(container)
 
         # scan instruments
         self.instruments = Instruments()
         self.instruments.scan_devices()
+        self.__options_list_visa = self.instruments.get_visa_list()
+        self.__options_list_serial = self.instruments.get_serial_list()
 
         value_inside_scope = tk.StringVar(self)
         value_inside_scope.set("Select Oscilloscope")
@@ -40,22 +41,33 @@ class InstrumentFrame(tk.Frame):
         self.label_name_frame.pack(side="top", anchor="w")
 
         # optionmenu scope ID
-        self.optionmenu_scopeID = tk.OptionMenu(self, value_inside_scope, *self.instruments.get_visa_list())
+        self.optionmenu_scopeID = tk.OptionMenu(self, value_inside_scope, *self.__options_list_visa)
         self.optionmenu_scopeID.config(width=43, height=1)
         self.optionmenu_scopeID.pack()
 
         # optionmenu generator port
-        self.optionmenu_generatorPort = tk.OptionMenu(self, value_inside_generator, *self.instruments.get_serial_list())
+        self.optionmenu_generatorPort = tk.OptionMenu(self, value_inside_generator, *self.__options_list_serial)
         self.optionmenu_generatorPort.config(width=43, height=1)
         self.optionmenu_generatorPort.pack()
 
         # show the frame on the container
         #self.pack(**options)
 
+    def get_visa_list(self):
+        return self.__options_list_visa
+    
+    def get_serial_list(self):
+        return self.__options_list_serial
+
 
 class TestFrame(tk.Frame):
     def __init__(self, container):
         super().__init__(container)
+
+        self.__string_start_frequency = tk.StringVar()
+        self.__string_end_frequency = tk.StringVar()
+        self.__string_frequency_steps = tk.StringVar()
+        self.__string_max_voltage = tk.StringVar()
 
         self.config(relief="groove")
         self.config(padx=8, pady=8)
@@ -75,8 +87,10 @@ class TestFrame(tk.Frame):
         self.label_startFrequency.grid(row=1, column=0, sticky="w")
 
         # textbox start frequency
-        self.textbox_startFrequency = tk.Text(self)
-        self.textbox_startFrequency.config(width=24, height=1)
+        self.__string_start_frequency.trace_add("write", self.__text_changed_start_frequency_Callback)
+        self.textbox_startFrequency = tk.Entry(self, textvariable=self.__string_start_frequency)
+        self.textbox_startFrequency.config(width=24)
+        self.textbox_startFrequency.insert(-1, "100")
         self.textbox_startFrequency.grid(row=1, column=1, sticky="w")
 
         # label end frequency
@@ -85,8 +99,10 @@ class TestFrame(tk.Frame):
         self.label_endFrequency.grid(row=2, column=0, sticky="w")
 
         # textbox end frequency
-        self.textbox_endFrequency = tk.Text(self)
-        self.textbox_endFrequency.config(width=24, height=1)
+        self.__string_end_frequency.trace_add("write", self.__text_changed_end_frequency_Callback)
+        self.textbox_endFrequency = tk.Entry(self, textvariable=self.__string_end_frequency)
+        self.textbox_endFrequency.config(width=24)
+        self.textbox_endFrequency.insert(-1, "10000")
         self.textbox_endFrequency.grid(row=2, column=1, sticky="w")
 
         # label frequency steps
@@ -95,8 +111,10 @@ class TestFrame(tk.Frame):
         self.label_frequencySteps.grid(row=3, column=0, sticky="w")
 
         # textbox frequency steps
-        self.textbox_frequencySteps = tk.Text(self)
-        self.textbox_frequencySteps.config(width=24, height=1)
+        self.__string_frequency_steps.trace_add("write", self.__text_changed_frequency_steps_Callback)
+        self.textbox_frequencySteps = tk.Entry(self, textvariable=self.__string_frequency_steps)
+        self.textbox_frequencySteps.config(width=24)
+        self.textbox_frequencySteps.insert(-1, "10")
         self.textbox_frequencySteps.grid(row=3, column=1, sticky="w")
 
         # label max voltage
@@ -105,44 +123,140 @@ class TestFrame(tk.Frame):
         self.label_maxVoltage.grid(row=4, column=0, sticky="w")
 
         # textbox max voltage
-        self.textbox_maxVoltage = tk.Text(self)
-        self.textbox_maxVoltage.config(width=24, height=1)
+        self.__string_max_voltage.trace_add("write", self.__text_changed_max_voltage_Callback)
+        self.textbox_maxVoltage = tk.Entry(self, textvariable=self.__string_max_voltage)
+        self.textbox_maxVoltage.config(width=24)
+        self.textbox_maxVoltage.insert(-1, "2")
         self.textbox_maxVoltage.grid(row=4, column=1, sticky="w")
 
+    def __text_changed_start_frequency_Callback(self, string, index, mode):
+        new_value = self.__string_start_frequency.get()
+        try:
+            new_value_int = int(new_value)
+            if new_value_int > 0:
+                self.__start_frequency_int = new_value_int
+                self.textbox_startFrequency.config(bg=Colors.TEXTBOX_OK)
+        except:
+            self.textbox_startFrequency.config(bg=Colors.TEXTBOX_ERROR)
+
+    def __text_changed_end_frequency_Callback(self, string, index, mode):
+        new_value = self.__string_end_frequency.get()
+        try:
+            new_value_int = int(new_value)
+            if new_value_int > self.__start_frequency_int:
+                self.__end_frequency_int = new_value_int
+                self.textbox_endFrequency.config(bg=Colors.TEXTBOX_OK)
+            else:
+                self.textbox_endFrequency.config(bg=Colors.TEXTBOX_ERROR)
+        except:
+            self.textbox_endFrequency.config(bg=Colors.TEXTBOX_ERROR)
+
+    def __text_changed_frequency_steps_Callback(self, string, index, mode):
+        new_value = self.__string_frequency_steps.get()
+        try:
+            new_value_int = int(new_value)
+            if new_value_int > 0:
+                self.__frequency_steps_int = new_value_int
+                self.textbox_frequencySteps.config(bg=Colors.TEXTBOX_OK)
+        except:
+            self.textbox_frequencySteps.config(bg=Colors.TEXTBOX_ERROR)
+
+    def __text_changed_max_voltage_Callback(self, string, index, mode):
+        new_value = self.__string_max_voltage.get()
+        try:
+            new_value_float = float(new_value)
+            if new_value_float > float(0) and new_value_float < float(6):
+                self.__max_voltage_float = new_value_float
+                self.textbox_maxVoltage.config(bg=Colors.TEXTBOX_OK)
+        except:
+            self.textbox_maxVoltage.config(bg=Colors.TEXTBOX_ERROR)
+
+    def get_start_frequency_value(self):
+        return self.__start_frequency_int
+    
+    def get_end_frequency_value(self):
+        return self.__end_frequency_int
+    
+    def get_frequency_steps_value(self):
+        return self.__frequency_steps_int
+    
+    def get_max_voltage_value(self):
+        return self.__max_voltage_float
+
+
 class ActionsFrame(tk.Frame):
-    def __init__(self, container):
+    def __init__(self, container, instrument_frame:InstrumentFrame, test_frame:TestFrame):
         super().__init__(container)
+
+        self.__list_visa = instrument_frame.get_visa_list()
+        self.__list_serial = instrument_frame.get_serial_list()
 
         self.config(relief="groove")
         self.config(padx=8, pady=8)
         self.config(border=1)
         self.config(bg=Colors.FRAME_BG)
+
+        self.__startFrequency = 100
+        self.__endFrequency = 10000
+        self.__frequencySteps = 10
+        self.__maxVoltage = 2
         
         self.grid(row=2, column=0, sticky="nsew", pady=5, padx=10)
 
         # button run analysis
-        self.button_runAnalysis = tk.Button(self, text="Run Analysis", command=self.__runAnalysisCallback)
+        self.button_runAnalysis = tk.Button(self, text="Run Analysis", command=lambda:self.__runAnalysisCallback(test_frame))
         self.button_runAnalysis.config(width=45)
         self.button_runAnalysis.config(bg=Colors.FRAME_BG)
         self.button_runAnalysis.grid(row=0, column=0)
 
         # button save log
-        self.button_saveLog = tk.Button(self, text="Save log", command=self.__runAnalysisCallback)
+        self.button_saveLog = tk.Button(self, text="Save log", command=self.__saveLog)
         self.button_saveLog.config(width=45)
         self.button_saveLog.config(bg=Colors.FRAME_BG)
         self.button_saveLog.grid(row=1, column=0)
 
         # button save plots
-        self.button_savePlots = tk.Button(self, text="Save plots", command=self.__runAnalysisCallback)
+        self.button_savePlots = tk.Button(self, text="Save plots", command=self.__savePlots)
         self.button_savePlots.config(width=45)
         self.button_savePlots.config(bg=Colors.FRAME_BG)
         self.button_savePlots.grid(row=2, column=0)
 
-    def __runAnalysisCallback(self):
-        print("heheheha")
+    def __runAnalysisCallback(self, test_frame:TestFrame):
+        try:
+            self.__startFrequency = test_frame.get_start_frequency_value()
+        except:
+            pass
+
+        try:
+            self.__endFrequency = test_frame.get_end_frequency_value()
+        except:
+            pass
+
+        try:
+            self.__frequencySteps = test_frame.get_frequency_steps_value()
+        except:
+            pass
+
+        try:
+            self.__maxVoltage = test_frame.get_max_voltage_value()
+        except:
+            pass
+        
+        print(self.__startFrequency)
+        print(self.__endFrequency)
+        print(self.__frequencySteps)
+        print(self.__maxVoltage)
 
 
-class BodePlotterApp(tk.Tk):
+    def __saveLog(self):
+        print(self.__list_visa[2])
+        print(self.__list_serial[1])
+
+    def __savePlots(self):
+        print(self.__list_visa[2])
+        print(self.__list_serial[1])
+
+class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         # configure the root window
@@ -150,3 +264,10 @@ class BodePlotterApp(tk.Tk):
         self.geometry('1400x900')
         self.config(bg=Colors.MAIN_WINDOW_BG)
         
+
+class BodePlotterApp():
+    def __init__(self, main_window:MainWindow) -> None:
+        self.main_window = main_window
+        inst = InstrumentFrame(main_window)
+        test = TestFrame(main_window)
+        actions = ActionsFrame(main_window, inst, test)
