@@ -3,6 +3,10 @@ from tkinter.messagebox import showinfo
 from Instruments.Instrument import Instruments
 from Instruments.Instrument import GeneratorConfig
 from Instruments.Instrument import ScopeConfig
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 class Colors():
     def _rgb_to_tkHex(rgb):
@@ -192,8 +196,25 @@ class TestFrame(tk.Frame):
         return self.__max_voltage_float
 
 
+class PlotFrame(tk.Frame):
+    def __init__(self, container):
+        super().__init__(container)
+
+        self.config(relief="groove")
+        self.config(padx=8, pady=8)
+        self.config(border=1)
+        self.config(bg=Colors.FRAME_BG)
+        
+        self.grid(row=0, column=1, rowspan=5, sticky="nsew", pady=5, padx=10)
+
+        # label instrument
+        self.label_name_frame = tk.Label(self, text='PLOTS')
+        self.label_name_frame.config(bg=Colors.FRAME_BG)
+        self.label_name_frame.pack(side="top", anchor="w")
+
+
 class ActionsFrame(tk.Frame):
-    def __init__(self, container, instrument_frame:InstrumentFrame, test_frame:TestFrame):
+    def __init__(self, container, instrument_frame:InstrumentFrame, test_frame:TestFrame, plot_frame:PlotFrame):
         super().__init__(container)
 
         self.__scope_open_flag = 0
@@ -202,6 +223,7 @@ class ActionsFrame(tk.Frame):
         self.__list_visa = instrument_frame.get_visa_list()
         self.__list_serial = instrument_frame.get_serial_list()
         self.__instrument_frame = instrument_frame
+        self.__plot_frame = plot_frame
 
         self.config(relief="groove")
         self.config(padx=8, pady=8)
@@ -275,8 +297,18 @@ class ActionsFrame(tk.Frame):
         self.__instrument_frame.instruments.initial_scope_config(scope_config)
         self.__instrument_frame.instruments.initial_generator_config(gen_config)
 
-
         self.__instrument_frame.instruments.start_analysis(gen_config)
+        
+        figure = Figure(figsize=(9,3), dpi=100)
+        figure_canvas = FigureCanvasTkAgg(figure, master=self.__plot_frame)
+
+        NavigationToolbar2Tk(figure_canvas, self.__plot_frame)
+        
+        axes = figure.add_subplot()
+        axes.grid(True)
+        axes.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array)
+
+        figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
 
     def __saveLog(self):
@@ -287,12 +319,13 @@ class ActionsFrame(tk.Frame):
         print(self.__list_visa[2])
         print(self.__list_serial[1])
 
+
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         # configure the root window
         self.title('Bode Plotter')
-        self.geometry('1400x900')
+        self.geometry('1400x700')
         self.config(bg=Colors.MAIN_WINDOW_BG)
         
 
@@ -301,4 +334,5 @@ class BodePlotterApp():
         self.main_window = main_window
         inst = InstrumentFrame(main_window)
         test = TestFrame(main_window)
-        actions = ActionsFrame(main_window, inst, test)
+        plotf = PlotFrame(main_window)
+        actions = ActionsFrame(main_window, inst, test, plotf)

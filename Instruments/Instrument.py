@@ -138,9 +138,9 @@ class Instruments:
     def start_analysis(self, config:GeneratorConfig):
         sleep(2*config.get_step_delay())
 
-        ch1Vmax = numpy.zeros(config.get_step_frequency() + 1)
-        ch2Vmax = numpy.zeros(config.get_step_frequency() + 1)
-        freqValues = numpy.zeros(config.get_step_frequency() + 1)
+        self.ch1Vmax = numpy.zeros(config.get_step_frequency() + 1)
+        self.ch2Vmax = numpy.zeros(config.get_step_frequency() + 1)
+        self.freqValues = numpy.zeros(config.get_step_frequency() + 1)
 
         freqInc = ((config.get_end_frequency()-config.get_start_frequency())/config.get_step_frequency())
         freq = config.get_start_frequency()
@@ -149,16 +149,13 @@ class Instruments:
             self.__gen_ch1.frequency(freq)
             self.__scope.write("TIMebase:MAIN:SCAle "+ str(1/(3*freq)))
             sleep(config.get_step_delay())
-            ch1Vmax[i] = self.__scope.query("MEASure:ITEM? VMAX,CHANnel1")
-            ch2Vmax[i] = self.__scope.query("MEASure:ITEM? VMAX,CHANnel2")
-            freqValues[i] = freq
+            self.ch1Vmax[i] = self.__scope.query("MEASure:ITEM? VMAX,CHANnel1")
+            self.ch2Vmax[i] = self.__scope.query("MEASure:ITEM? VMAX,CHANnel2")
+            self.freqValues[i] = freq
             freq = freq + freqInc
             i = i + 1
 
-        print(ch1Vmax)
-        print(ch2Vmax)
-        print(freqValues)
-        print(self._db_compute(ch1Vmax, ch2Vmax, config.get_step_frequency()))
+        self.db_array = self._db_compute(self.ch1Vmax, self.ch2Vmax, config.get_step_frequency())
 
 
     def _db_compute(self, ch1V:numpy.ndarray, ch2:numpy.ndarray, freqSteps:int):
