@@ -22,11 +22,11 @@ class InstrumentFrame(tk.Frame):
         self.__options_list_visa = self.instruments.get_visa_list()
         self.__options_list_serial = self.instruments.get_serial_list()
 
-        value_inside_scope = tk.StringVar(self)
-        value_inside_scope.set("Select Oscilloscope")
+        self.__value_inside_scope = tk.StringVar(self)
+        self.__value_inside_scope.set("Select Oscilloscope")
 
-        value_inside_generator = tk.StringVar(self)
-        value_inside_generator.set("Select Generator")
+        self.__value_inside_generator = tk.StringVar(self)
+        self.__value_inside_generator.set("Select Generator")
 
         self.config(relief="groove")
         self.config(padx=8, pady=8)
@@ -41,12 +41,12 @@ class InstrumentFrame(tk.Frame):
         self.label_name_frame.pack(side="top", anchor="w")
 
         # optionmenu scope ID
-        self.optionmenu_scopeID = tk.OptionMenu(self, value_inside_scope, *self.__options_list_visa)
+        self.optionmenu_scopeID = tk.OptionMenu(self, self.__value_inside_scope, *self.__options_list_visa)
         self.optionmenu_scopeID.config(width=43, height=1)
         self.optionmenu_scopeID.pack()
 
         # optionmenu generator port
-        self.optionmenu_generatorPort = tk.OptionMenu(self, value_inside_generator, *self.__options_list_serial)
+        self.optionmenu_generatorPort = tk.OptionMenu(self, self.__value_inside_generator, *self.__options_list_serial)
         self.optionmenu_generatorPort.config(width=43, height=1)
         self.optionmenu_generatorPort.pack()
 
@@ -58,6 +58,12 @@ class InstrumentFrame(tk.Frame):
     
     def get_serial_list(self):
         return self.__options_list_serial
+    
+    def get_selected_scope_id(self):
+        return self.__value_inside_scope.get()
+    
+    def get_selected_gen_port(self):
+        return self.__value_inside_generator.get()
 
 
 class TestFrame(tk.Frame):
@@ -188,8 +194,12 @@ class ActionsFrame(tk.Frame):
     def __init__(self, container, instrument_frame:InstrumentFrame, test_frame:TestFrame):
         super().__init__(container)
 
+        self.__scope_open_flag = 0
+        self.__gen_open_flag = 0
+
         self.__list_visa = instrument_frame.get_visa_list()
         self.__list_serial = instrument_frame.get_serial_list()
+        self.__instrument_frame = instrument_frame
 
         self.config(relief="groove")
         self.config(padx=8, pady=8)
@@ -241,6 +251,19 @@ class ActionsFrame(tk.Frame):
             self.__maxVoltage = test_frame.get_max_voltage_value()
         except:
             pass
+
+        self.scope_id = self.__instrument_frame.get_selected_scope_id()
+        self.gen_port = self.__instrument_frame.get_selected_gen_port()
+
+        if self.__scope_open_flag == 0:
+            self.__instrument_frame.instruments.open_scope(self.scope_id)
+            self.__scope_open_flag = 1
+
+        if self.__gen_open_flag == 0:
+            self.__instrument_frame.instruments.open_generator(self.gen_port)
+            self.__gen_open_flag = 1
+
+        self.__instrument_frame.instruments.test_generator(self.__endFrequency)
         
         print(self.__startFrequency)
         print(self.__endFrequency)
