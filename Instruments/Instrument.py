@@ -2,6 +2,24 @@ import pyvisa
 import serial.tools.list_ports
 import feeltech
 
+class GeneratorConfig:
+    def __init__(self, max_voltage:float, start_frequency:int) -> None:
+        self.__max_voltage = max_voltage
+        self.__start_frequency = start_frequency
+
+    def set_max_voltage(self, max_voltage:float):
+        self.__max_voltage = max_voltage
+
+    def set_start_frequency(self, start_frequency:int):
+        self.__start_frequency = start_frequency
+
+    def get_max_voltage(self) -> float:
+        return self.__max_voltage
+    
+    def get_start_frequency(self) -> int:
+        return self.__start_frequency
+    
+
 class Instruments:
     def __init__(self) -> None:
         self.__visa_list = []
@@ -54,8 +72,22 @@ class Instruments:
 
         return return_status
     
+    def initial_scope_config(self):
+        self.__scope.write("MEASure:CLEar ALL")				        #Clear all measurement items
+        self.__scope.write("MEASure:ITEM VMAX,CHANnel1")			#Create the VMax measurement item for CH1
+        self.__scope.write("MEASure:ITEM VMAX,CHANnel2")			#Create the VMax measurement item for CH2
+
+    def initial_generator_config(self, config:GeneratorConfig):
+        self.__gen_ch1.waveform(feeltech.SINE)					    #CH1 will generate a sine wave
+        self.__gen_ch1.amplitude(config.get_max_voltage())			#Set CH1 peak to peak voltage
+        self.__gen_ch1.frequency(config.get_start_frequency())		#Set CH1 frequency
+
     def test_generator(self, freq):
         self.__gen_ch1.frequency(freq)
+
+    def test_scope(self):
+        self.__scope.write("MEASure:ITEM VMAX,CHANnel1")
+        self.__scope.write("MEASure:ITEM VMAX,CHANnel2")
     
     def __del__(self):
         print("Closing")
@@ -64,3 +96,4 @@ class Instruments:
             self.__generator.close()
         except:
             pass
+

@@ -1,6 +1,7 @@
 import  tkinter as tk
 from tkinter.messagebox import showinfo
 from Instruments.Instrument import Instruments
+from Instruments.Instrument import GeneratorConfig
 
 class Colors():
     def _rgb_to_tkHex(rgb):
@@ -263,7 +264,11 @@ class ActionsFrame(tk.Frame):
             self.__instrument_frame.instruments.open_generator(self.gen_port)
             self.__gen_open_flag = 1
 
-        self.__instrument_frame.instruments.test_generator(self.__endFrequency)
+        gen_config = GeneratorConfig(self.__maxVoltage, self.__startFrequency)
+
+        self.__instrument_frame.instruments.initial_scope_config()
+        self.__instrument_frame.instruments.initial_generator_config(gen_config)
+        
         
         print(self.__startFrequency)
         print(self.__endFrequency)
