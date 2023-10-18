@@ -205,7 +205,7 @@ class PlotFrame(tk.Frame):
         self.config(border=1)
         self.config(bg=Colors.FRAME_BG)
         
-        self.grid(row=0, column=1, rowspan=5, sticky="nsew", pady=5, padx=10)
+        self.grid(row=0, column=1, rowspan=8, sticky="nsew", pady=5, padx=10)
 
         # label instrument
         self.label_name_frame = tk.Label(self, text='PLOTS')
@@ -257,6 +257,17 @@ class ActionsFrame(tk.Frame):
         self.button_savePlots.config(bg=Colors.FRAME_BG)
         self.button_savePlots.grid(row=2, column=0)
 
+        self.__figure = Figure(figsize=(9,6), dpi=100)
+        self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
+        self.__canvas = FigureCanvasTkAgg(self.__figure, master=self.__plot_frame)
+        self.__canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        NavigationToolbar2Tk(self.__canvas, self.__plot_frame)
+
+        self.__ax.plot([0,1,2], [0, 0, 0])
+        self.__ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
+        self.__ax.grid(which="minor", color="#EEEEEE", linestyle="dotted")
+        self.__ax.minorticks_on()
+
     def __runAnalysisCallback(self, test_frame:TestFrame):
         try:
             self.__startFrequency = test_frame.get_start_frequency_value()
@@ -301,18 +312,11 @@ class ActionsFrame(tk.Frame):
 
         self.__instrument_frame.instruments.start_analysis(gen_config)
         
-        if not self.__figure_created_flag:
-            self.__figure = Figure(figsize=(9,3), dpi=100)
-            self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
-            self.__canvas = FigureCanvasTkAgg(self.__figure, master=self.__plot_frame)
-            self.__canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-            NavigationToolbar2Tk(self.__canvas, self.__plot_frame)
-
-            self.__figure_created_flag = 1
         
         self.__ax.clear()
         self.__ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
-        self.__ax.grid(which="minor", color="#EEEEEE", linestyle=":")
+        self.__ax.grid(which="minor", color="#EEEEEE", linestyle="dotted")
+        self.__ax.minorticks_on()
         self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array)
         self.__canvas.draw()
 
@@ -333,7 +337,7 @@ class MainWindow(tk.Tk):
         super().__init__()
         # configure the root window
         self.title('Bode Plotter')
-        self.geometry('1400x700')
+        self.geometry('1324x700')
         self.config(bg=Colors.MAIN_WINDOW_BG)
         
 
