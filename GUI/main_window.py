@@ -80,6 +80,7 @@ class TestFrame(tk.Frame):
         self.__string_end_frequency = tk.StringVar()
         self.__string_frequency_steps = tk.StringVar()
         self.__string_max_voltage = tk.StringVar()
+        self.__string_step_delay = tk.StringVar()
 
         self.config(relief="groove")
         self.config(padx=8, pady=8)
@@ -141,6 +142,18 @@ class TestFrame(tk.Frame):
         self.textbox_maxVoltage.insert(-1, "2")
         self.textbox_maxVoltage.grid(row=4, column=1, sticky="w")
 
+        # label step delay
+        self.label_stepDelay = tk.Label(self, text='Step delay (s)')
+        self.label_stepDelay.config(bg=Colors.FRAME_BG)
+        self.label_stepDelay.grid(row=5, column=0, sticky="w")
+
+        # textbox step delay
+        self.__string_step_delay.trace_add("write", self.__text_changed_step_delay_Callback)
+        self.textbox_stepDelay = tk.Entry(self, textvariable=self.__string_step_delay)
+        self.textbox_stepDelay.config(width=24)
+        self.textbox_stepDelay.insert(-1, "0.7")
+        self.textbox_stepDelay.grid(row=5, column=1, sticky="w")
+
     def __text_changed_start_frequency_Callback(self, string, index, mode):
         new_value = self.__string_start_frequency.get()
         try:
@@ -183,6 +196,16 @@ class TestFrame(tk.Frame):
         except:
             self.textbox_maxVoltage.config(bg=Colors.TEXTBOX_ERROR)
 
+    def __text_changed_step_delay_Callback(self, string, index, mode):
+        new_value = self.__string_step_delay.get()
+        try:
+            new_value_float = float(new_value)
+            if new_value_float > float(0):
+                self.__step_delay_float = new_value_float
+                self.textbox_stepDelay.config(bg=Colors.TEXTBOX_OK)
+        except:
+            self.textbox_stepDelay.config(bg=Colors.TEXTBOX_ERROR)
+
     def get_start_frequency_value(self):
         return self.__start_frequency_int
     
@@ -194,6 +217,9 @@ class TestFrame(tk.Frame):
     
     def get_max_voltage_value(self):
         return self.__max_voltage_float
+    
+    def get_step_delay_value(self):
+        return self.__step_delay_float
 
 
 class PlotFrame(tk.Frame):
@@ -289,6 +315,11 @@ class ActionsFrame(tk.Frame):
         except:
             pass
 
+        try:
+            self.__stepDelay = test_frame.get_step_delay_value()
+        except:
+            pass
+
         self.scope_id = self.__instrument_frame.get_selected_scope_id()
         self.gen_port = self.__instrument_frame.get_selected_gen_port()
 
@@ -304,7 +335,7 @@ class ActionsFrame(tk.Frame):
                                      self.__startFrequency,
                                      self.__endFrequency,
                                      self.__frequencySteps,
-                                     0.7,)
+                                     self.__stepDelay)
         scope_config = ScopeConfig(self.__startFrequency, self.__maxVoltage)
 
         self.__instrument_frame.instruments.initial_scope_config(scope_config)
