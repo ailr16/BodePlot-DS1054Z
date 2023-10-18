@@ -174,7 +174,6 @@ class Instruments:
         self.__scope.write("MEASure:ITEM VMAX,CHANnel2")
     
     def __del__(self):
-        print("Closing")
         try:
             self.__scope.close()
             self.__generator.close()

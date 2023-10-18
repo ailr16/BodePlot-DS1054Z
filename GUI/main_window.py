@@ -211,6 +211,7 @@ class PlotFrame(tk.Frame):
         self.label_name_frame = tk.Label(self, text='PLOTS')
         self.label_name_frame.config(bg=Colors.FRAME_BG)
         self.label_name_frame.pack(side="top", anchor="w")
+        
 
 
 class ActionsFrame(tk.Frame):
@@ -219,6 +220,7 @@ class ActionsFrame(tk.Frame):
 
         self.__scope_open_flag = 0
         self.__gen_open_flag = 0
+        self.__figure_created_flag = 0
 
         self.__list_visa = instrument_frame.get_visa_list()
         self.__list_serial = instrument_frame.get_serial_list()
@@ -299,16 +301,19 @@ class ActionsFrame(tk.Frame):
 
         self.__instrument_frame.instruments.start_analysis(gen_config)
         
-        figure = Figure(figsize=(9,3), dpi=100)
-        figure_canvas = FigureCanvasTkAgg(figure, master=self.__plot_frame)
+        if not self.__figure_created_flag:
+            self.__figure = Figure(figsize=(9,3), dpi=100)
+            self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
+            self.__canvas = FigureCanvasTkAgg(self.__figure, master=self.__plot_frame)
+            self.__canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        NavigationToolbar2Tk(figure_canvas, self.__plot_frame)
+            self.__figure_created_flag = 1
         
-        axes = figure.add_subplot()
-        axes.grid(True)
-        axes.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array)
+        self.__ax.clear()
+        self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array)
+        self.__canvas.draw()
 
-        figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        #self.__figure_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
 
     def __saveLog(self):
