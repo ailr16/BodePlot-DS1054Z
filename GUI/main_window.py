@@ -370,8 +370,8 @@ class ActionsFrame(tk.Frame):
         
         
         self.__ax.clear()
-        self.__ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
-        self.__ax.grid(which="minor", color="#EEEEEE", linestyle="dotted")
+        self.__ax.grid(which="major", color="#DCDCDC", linewidth=0.8)
+        self.__ax.grid(which="minor", color="#EDEDED", linestyle="dotted")
         self.__ax.minorticks_on()
         self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array, label="Magnitude (db)")
         self.__ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.08))
