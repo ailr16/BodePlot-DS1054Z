@@ -408,6 +408,7 @@ class MainWindow(tk.Tk):
         self.title('Bode Plotter')
         self.geometry('1324x700')
         self.config(bg=Colors.MAIN_WINDOW_BG)
+        self.resizable(width=False, height=False)
         
 
 class BodePlotterApp():
