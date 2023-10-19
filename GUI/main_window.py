@@ -307,6 +307,7 @@ class ActionsFrame(tk.Frame):
 
         self.__figure = Figure(figsize=(9,6), dpi=100)
         self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
+        self.__axP = self.__ax.twinx()
         self.__canvas = FigureCanvasTkAgg(self.__figure, master=self.__plot_frame)
         self.__canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         NavigationToolbar2Tk(self.__canvas, self.__plot_frame)
@@ -370,12 +371,19 @@ class ActionsFrame(tk.Frame):
         
         
         self.__ax.clear()
+        self.__axP.clear()
         self.__ax.grid(which="major", color="#DCDCDC", linewidth=0.8)
         self.__ax.grid(which="minor", color="#EDEDED", linestyle="dotted")
         self.__ax.minorticks_on()
         self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array, label="Magnitude (db)")
-        self.__ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.08))
+        self.__axP.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.phaseValues, label="Phase (°)", color="orange")
+        self.__ax.legend(loc="upper center", bbox_to_anchor=(0.40, 1.08))
+        self.__axP.legend(loc="upper center", bbox_to_anchor=(0.60, 1.08))
         self.__ax.set_xlabel("Frequency")
+        self.__ax.set_ylabel("db")
+        self.__axP.set_ylabel("Degree")
+        self.__axP.yaxis.set_label_position("right")
+        self.__axP.yaxis.tick_right()
         self.__canvas.draw()
 
         self.__filename_date = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
@@ -383,7 +391,10 @@ class ActionsFrame(tk.Frame):
 
     def __saveLog(self):
         filename = self.__string_log_dir.get() + self.__filename_date
-        numpy.savetxt(filename + ".csv", numpy.c_[self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array], delimiter=",")
+        numpy.savetxt(filename + ".csv", numpy.c_[self.__instrument_frame.instruments.freqValues,
+                                                  self.__instrument_frame.instruments.db_array,
+                                                  self.__instrument_frame.instruments.phaseValues],
+                                                  delimiter=",")
 
     def __savePlots(self):
         filename = self.__string_log_dir.get() + self.__filename_date

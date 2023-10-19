@@ -117,6 +117,9 @@ class Instruments:
         self.__scope.write("MEASure:ITEM VMAX,CHANnel1")			#Create the VMax measurement item for CH1
         self.__scope.write("MEASure:ITEM VMAX,CHANnel2")			#Create the VMax measurement item for CH2
         self.__scope.write("TIMebase:MAIN:SCAle " + str(1/(3*config.get_frequency())))
+        self.__scope.write("TRIGger:SWEep AUTO")
+        self.__scope.write("TRIGger:EDGe:SOURce CHANnel1")
+        self.__scope.write("TRIGger:EDGe:LEVel 0.1")
 
         if config.get_max_voltage() <= 3.5:						#Set vertical scale of oscilloscope
             self.__scope.write("CHANnel1:SCALe 1")
@@ -141,6 +144,7 @@ class Instruments:
         self.ch1Vmax = numpy.zeros(config.get_step_frequency() + 1)
         self.ch2Vmax = numpy.zeros(config.get_step_frequency() + 1)
         self.freqValues = numpy.zeros(config.get_step_frequency() + 1)
+        self.phaseValues = numpy.zeros(config.get_step_frequency() + 1)
 
         freqInc = ((config.get_end_frequency()-config.get_start_frequency())/config.get_step_frequency())
         freq = config.get_start_frequency()
@@ -149,9 +153,20 @@ class Instruments:
             self.__gen_ch1.frequency(freq)
             self.__scope.write("TIMebase:MAIN:SCAle "+ str(1/(3*freq)))
             sleep(config.get_step_delay())
-            self.ch1Vmax[i] = self.__scope.query("MEASure:ITEM? VMAX,CHANnel1")
-            self.ch2Vmax[i] = self.__scope.query("MEASure:ITEM? VMAX,CHANnel2")
+            
+            actual_ch1 = float(self.__scope.query("MEASure:ITEM? VMAX,CHANnel1"))
+            actual_ch2 = float(self.__scope.query("MEASure:ITEM? VMAX,CHANnel2"))
+            actual_phase = float(self.__scope.query("MEASure:STATistic:ITEM? AVERages,RPHase"))
+
+            self.ch1Vmax[i] = actual_ch1
+            self.ch2Vmax[i] = actual_ch2
+            if actual_phase > -180.0 and actual_phase < 180.0:
+                self.phaseValues[i] = actual_phase
             self.freqValues[i] = freq
+
+            self.__scope.write("CHANnel1:SCALe " + str(actual_ch1/2))
+            self.__scope.write("CHANnel2:SCALe " + str(actual_ch2/2))
+
             freq = freq + freqInc
             i = i + 1
 
