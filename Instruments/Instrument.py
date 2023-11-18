@@ -116,6 +116,7 @@ class Instruments:
         self.__scope.write("MEASure:CLEar ALL")				        #Clear all measurement items
         self.__scope.write("MEASure:ITEM VMAX,CHANnel1")			#Create the VMax measurement item for CH1
         self.__scope.write("MEASure:ITEM VMAX,CHANnel2")			#Create the VMax measurement item for CH2
+        self.__scope.write("MEASure:ITEM RPHase, CHANnel1, CHANnel2")			#Create the VMax measurement item for CH2
         self.__scope.write("TIMebase:MAIN:SCAle " + str(1/(3*config.get_frequency())))
         self.__scope.write("TRIGger:SWEep AUTO")
         self.__scope.write("TRIGger:EDGe:SOURce CHANnel1")

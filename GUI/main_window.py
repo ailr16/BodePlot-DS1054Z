@@ -305,6 +305,18 @@ class ActionsFrame(tk.Frame):
         self.textbox_logDir.grid(row=4, column=0, sticky="w")
         self.textbox_logDir["state"] = "disabled"
 
+        # checkbutton magnitude
+        self.check_var_magnitude = tk.IntVar(value=1)
+        self.checkbox_magnitude = tk.Checkbutton(self, text="Magnitude plot", variable=self.check_var_magnitude, command=self.__checkboxes_plot)
+        self.checkbox_magnitude.config(bg=Colors.FRAME_BG)
+        self.checkbox_magnitude.grid(row=6, column=0, sticky="w")
+
+        # checkbutton phase
+        self.check_var_phase = tk.IntVar(value=1)
+        self.checkbox_phase = tk.Checkbutton(self, text="Phase plot", variable=self.check_var_phase, command=self.__checkboxes_plot)
+        self.checkbox_phase.config(bg=Colors.FRAME_BG)
+        self.checkbox_phase.grid(row=7, column=0, sticky="w")
+
         self.__figure = Figure(figsize=(9,6), dpi=100)
         self.__ax = self.__figure.add_axes([0.1, 0.1, 0.8, 0.8])
         self.__axP = self.__ax.twinx()
@@ -387,6 +399,7 @@ class ActionsFrame(tk.Frame):
         self.__canvas.draw()
 
         self.__filename_date = datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+        self.__measurement_done_flag = 1
 
 
     def __saveLog(self):
@@ -400,6 +413,52 @@ class ActionsFrame(tk.Frame):
         filename = self.__string_log_dir.get() + self.__filename_date
         self.__figure.savefig(filename + ".png")
 
+    def __checkboxes_plot(self):
+        if self.__measurement_done_flag:
+            if (self.check_var_magnitude.get() == 1) and (self.check_var_phase.get() == 1):
+                self.__ax.clear()
+                self.__axP.clear()
+                self.__ax.grid(which="major", color="#DCDCDC", linewidth=0.8)
+                self.__ax.grid(which="minor", color="#EDEDED", linestyle="dotted")
+                self.__ax.minorticks_on()
+                self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array, label="Magnitude (db)")
+                self.__axP.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.phaseValues, label="Phase (°)", color="orange")
+                self.__ax.legend(loc="upper center", bbox_to_anchor=(0.40, 1.08))
+                self.__axP.legend(loc="upper center", bbox_to_anchor=(0.60, 1.08))
+                self.__ax.set_xlabel("Frequency")
+                self.__ax.set_ylabel("db")
+                self.__axP.set_ylabel("Degree")
+                self.__axP.yaxis.set_label_position("right")
+                self.__axP.yaxis.tick_right()
+                self.__canvas.draw()
+            elif (self.check_var_magnitude.get() == 1) and (self.check_var_phase.get() == 0):
+                self.__ax.clear()
+                self.__axP.clear()
+                self.__ax.grid(which="major", color="#DCDCDC", linewidth=0.8)
+                self.__ax.grid(which="minor", color="#EDEDED", linestyle="dotted")
+                self.__ax.minorticks_on()
+                self.__ax.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.db_array, label="Magnitude (db)") 
+                self.__ax.legend(loc="upper center", bbox_to_anchor=(0.40, 1.08))
+                self.__ax.set_xlabel("Frequency")
+                self.__ax.set_ylabel("db")
+                self.__canvas.draw()
+            elif (self.check_var_magnitude.get() == 0) and (self.check_var_phase.get() == 1):
+                self.__ax.clear()
+                self.__axP.clear()
+                self.__ax.grid(which="major", color="#DCDCDC", linewidth=0.8)
+                self.__ax.grid(which="minor", color="#EDEDED", linestyle="dotted")
+                self.__ax.minorticks_on()
+                self.__axP.plot(self.__instrument_frame.instruments.freqValues, self.__instrument_frame.instruments.phaseValues, label="Phase (°)", color="orange")
+                self.__axP.legend(loc="upper center", bbox_to_anchor=(0.60, 1.08))
+                self.__ax.set_xlabel("Frequency")
+                self.__axP.set_ylabel("Degree")
+                self.__axP.yaxis.set_label_position("right")
+                self.__axP.yaxis.tick_right()
+                self.__canvas.draw()
+            else:
+                pass
+        else:
+            pass
 
 class MainWindow(tk.Tk):
     def __init__(self):
