@@ -72,7 +72,15 @@ crw-rw---- 1 root uucp 188, 0 Jun 10 19:54 /dev/ttyUSB0
 There's a guide to setup the instruments with VISA. Check this:https://lucask07.github.io/instrbuilder/build/html/linux_visa.html
 
 - Basically create the file *99-com.rules* inside */etc/udev/rules.d/* (if it don't exist)
-- Add the line *SUBSYSTEM=="usb", MODE="0666", GROUP="usbusers"*
+   ```
+   cd /etc/udev/rules.d/
+   sudo nano 99-com.rules
+   ```
+- Add the line:
+   ```
+   SUBSYSTEM=="usb", MODE="0666", GROUP="usbusers"
+   ```
+   And save with Ctrl+O
 - Add your user to *usbuser* group with:
     ```
     sudo groupadd usbusers
