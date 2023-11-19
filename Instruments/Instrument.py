@@ -200,12 +200,12 @@ class Instruments:
             
             actual_ch1 = float(self.__scope.query("MEASure:ITEM? VMAX,CHANnel1"))
             actual_ch2 = float(self.__scope.query("MEASure:ITEM? VMAX,CHANnel2"))
-            actual_phase = float(self.__scope.query("MEASure:STATistic:ITEM? AVERages,RPHase"))
+            actual_phase = float(self.__scope.query("MEASure:STATistic:ITEM? MINimum,RPHase"))
 
             self.ch1Vmax[i] = actual_ch1
             self.ch2Vmax[i] = actual_ch2
 
-            if actual_phase > -180.0 and actual_phase < 180.0:
+            if actual_phase >= -180.0 and actual_phase <= 180.0:
                 self.phaseValues[i] = actual_phase
             self.freqValues[i] = freq
 
