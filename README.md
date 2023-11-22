@@ -7,6 +7,8 @@
 
    https://github.com/ailr16/BodePlot-DS1054Z/releases/tag/releaseGUIv1.1
 
+   [![IMAGE ALT TEXT](http://img.youtube.com/vi/PC2ccm4rZgQ/0.jpg)](https://www.youtube.com/watch?v=PC2ccm4rZgQ "Bode Plotter (DS1054z and FY3224s)")
+
 - BodePlot-v1.0 
 
    https://github.com/ailr16/BodePlot-DS1054Z/releases/tag/releaseV1
